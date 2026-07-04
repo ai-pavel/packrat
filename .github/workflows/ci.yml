@@ -7,6 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y cmake libssl-dev
-      - run: mkdir -p build && cd build && cmake .. && make
+      - run: sudo apt-get update && sudo apt-get install -y cmake libssl-dev lcov
+      - run: mkdir -p build && cd build && cmake .. -DCMAKE_C_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage" && make
       - run: cd build && ctest --output-on-failure || true
+      - run: |
+          lcov --capture --directory build --output-file coverage.info --ignore-errors mismatch
+          lcov --remove coverage.info '/usr/*' --output-file coverage.info
+      - uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.info
+          fail_ci_if_error: false
