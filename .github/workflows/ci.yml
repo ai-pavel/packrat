@@ -11,8 +11,8 @@ jobs:
       - run: mkdir -p build && cd build && cmake .. -DCMAKE_C_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage" && make
       - run: cd build && ctest --output-on-failure || true
       - run: |
-          lcov --capture --directory build --output-file coverage.info --ignore-errors mismatch
-          lcov --remove coverage.info '/usr/*' --output-file coverage.info
+          lcov --capture --directory build --output-file coverage.info --ignore-errors mismatch --ignore-errors unused
+          lcov --remove coverage.info '/usr/*' --output-file coverage.info --ignore-errors unused
       - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
