@@ -51,6 +51,13 @@ int lz77_encode(const LZ77Config *cfg, const uint8_t *data, size_t data_len,
             }
         }
 
+        /* Ensure there is always a valid next_char byte after the match.
+           If the match extends to the very end of data, shorten it by one
+           so the last byte becomes next_char instead of being lost. */
+        if (best_length > 0 && pos + best_length >= data_len) {
+            best_length = (uint16_t)(data_len - pos - 1);
+        }
+
         uint8_t next = 0;
         if (pos + best_length < data_len) {
             next = data[pos + best_length];
